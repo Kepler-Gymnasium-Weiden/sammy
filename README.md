@@ -5,5 +5,5 @@
 3. virtual environement erstellen
     a. `python3.9 -m venv venv`
     b. `source venv/bin/activate`
-4. bibliotheken installieren `pip install -r requirements.txt`
+4. bibliotheken installieren `pip3.9 install -r requirements.txt`
 5. software ausühren `python3.9 main.py`
