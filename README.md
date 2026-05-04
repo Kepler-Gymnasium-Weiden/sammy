@@ -1,9 +1,9 @@
 # Pib software verweden
 
-1. sicherstellen, dass pyton 3.9.x installiert ist [link](https://github.com/pib-rocks/pib-sdk/tree/PR-978#installing-a-compatible-python-version-alongside-your-current-one-in-pi-os)
+1. sicherstellen, dass python 3.9.x installiert ist [link](https://github.com/pib-rocks/pib-sdk/tree/PR-978#installing-a-compatible-python-version-alongside-your-current-one-in-pi-os)
 2. in src ordner navigieren `cd src`
 3. virtual environement erstellen
-    a. `pyton -m venv venv`
+    a. `python3.9 -m venv venv`
     b. `source venv/bin/activate`
 4. bibliotheken installieren `pip install -r requirements.txt`
-5. software ausühren `pyton main.py`
+5. software ausühren `python3.9 main.py`
