@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QPushButton,
     QCheckBox,
-    QSpinBox,
+    QComboBox,
     QSlider,
     QListWidget,
     QFrame,
@@ -153,9 +153,12 @@ class EyesSettingsPanel(QWidget):
             cam_controls.addWidget(self._cam_off_btn)
 
             cam_controls.addWidget(QLabel("Device:"))
-            self._device = QSpinBox()
-            self._device.setRange(0, 8)
-            self._device.valueChanged.connect(self._camera.set_device)
+            self._device = QComboBox()
+            for index, name in CameraBackend.list_camera_devices():
+                self._device.addItem(f"{index}: {name}", index)
+            if self._device.count() == 0:
+                self._device.addItem("No camera found", 0)
+            self._device.currentIndexChanged.connect(self._on_device_changed)
             cam_controls.addWidget(self._device)
 
             self._overlay_check = QCheckBox("Show detection overlay")
@@ -252,6 +255,11 @@ class EyesSettingsPanel(QWidget):
             self._cam_off_btn.setEnabled(True)
         except Exception as exc:
             self._preview.setText(f"Camera error: {exc}")
+
+    def _on_device_changed(self, index: int):
+        device_index = self._device.itemData(index)
+        if device_index is not None:
+            self._camera.set_device(device_index)
 
     def _stop_camera(self):
         self._camera.stop()

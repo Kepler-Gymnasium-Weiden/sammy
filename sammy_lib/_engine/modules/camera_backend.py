@@ -114,3 +114,23 @@ class CameraBackend(QObject):
         self._device_index = int(index)
         if was_running:
             self.start()
+
+    @staticmethod
+    def list_camera_devices(max_probe: int = 8) -> list[tuple[int, str]]:
+        """Probe camera indices and return the ones that open.
+
+        OpenCV has no enumeration API, so we open each index in turn and
+        keep those that respond. Returns ``[(index, friendly_name), ...]``.
+        """
+        if not _HAVE_OPENCV:
+            return []
+        backend = cv2.CAP_DSHOW if hasattr(cv2, "CAP_DSHOW") else 0
+        result = []
+        for i in range(max_probe):
+            cap = cv2.VideoCapture(i, backend)
+            try:
+                if cap.isOpened():
+                    result.append((i, f"Camera {i}"))
+            finally:
+                cap.release()
+        return result
