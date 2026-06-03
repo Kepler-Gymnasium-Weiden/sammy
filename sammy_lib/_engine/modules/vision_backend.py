@@ -20,9 +20,16 @@ from .camera_backend import CameraBackend
 try:
     from ultralytics import YOLO  # type: ignore
     _HAVE_YOLO = True
-except Exception:
+    _YOLO_IMPORT_ERROR = ""
+except Exception as _exc:
+    # Importing ultralytics can fail even when the package itself is installed:
+    # it pulls in torch and friends, which are heavy and fragile on some
+    # platforms (e.g. a Raspberry Pi / ARM without a matching torch wheel, or a
+    # numpy version clash). Capture the real reason rather than reporting the
+    # misleading "not installed".
     YOLO = None  # type: ignore
     _HAVE_YOLO = False
+    _YOLO_IMPORT_ERROR = f"{type(_exc).__name__}: {_exc}"
 
 
 class VisionBackend(QObject):
@@ -37,8 +44,19 @@ class VisionBackend(QObject):
         self._model: Optional[object] = None
         self._last_detections: list[dict] = []
 
+        if not _HAVE_YOLO and _YOLO_IMPORT_ERROR:
+            # Surface the real reason in the engine log so a broken/incompatible
+            # dependency isn't mistaken for "ultralytics not installed".
+            print(f"[vision] object detection disabled: {_YOLO_IMPORT_ERROR}",
+                  flush=True)
+
     def is_available(self) -> bool:
         return _HAVE_YOLO
+
+    @property
+    def import_error(self) -> str:
+        """Why detection is unavailable (empty string if it's fine)."""
+        return _YOLO_IMPORT_ERROR
 
     def set_confidence(self, value: float):
         self._confidence = max(0.0, min(1.0, float(value)))

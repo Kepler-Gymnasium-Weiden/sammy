@@ -175,9 +175,11 @@ class EyesSettingsPanel(QWidget):
         root.addWidget(self._section_header("Detection"))
 
         if not self._vision.is_available():
-            root.addWidget(QLabel(
-                "ultralytics is not installed — object detection disabled."
-            ))
+            reason = getattr(self._vision, "import_error", "") \
+                or "ultralytics is not available."
+            label = QLabel(f"Object detection off: {reason}")
+            label.setWordWrap(True)
+            root.addWidget(label)
         else:
             conf_row = QHBoxLayout()
             conf_row.addWidget(QLabel("Confidence:"))
