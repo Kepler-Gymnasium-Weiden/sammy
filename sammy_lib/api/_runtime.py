@@ -32,16 +32,21 @@ class Runtime:
         self._transport: Optional[Transport] = None
         self._lock = threading.Lock()
         self._fullscreen = True
+        self._robot_host = "localhost"
+        self._robot_port = 9090
         atexit.register(self._shutdown)
 
     # ---- configuration -------------------------------------------------
 
-    def configure(self, *, fullscreen: bool = True):
+    def configure(self, *, fullscreen: bool = True,
+                  robot_host: str = "localhost", robot_port: int = 9090):
         """Adjust startup options. Must be called before the first API call."""
         with self._lock:
             if self._transport is not None:
                 return  # already running, ignore
             self._fullscreen = fullscreen
+            self._robot_host = robot_host
+            self._robot_port = robot_port
 
     # ---- startup -------------------------------------------------------
 
@@ -53,7 +58,9 @@ class Runtime:
             return self._transport
 
     def _start_engine(self) -> Transport:
-        cmd = [sys.executable, "-m", "sammy_lib._engine", "--port", "0"]
+        cmd = [sys.executable, "-m", "sammy_lib._engine", "--port", "0",
+               "--robot-host", str(self._robot_host),
+               "--robot-port", str(self._robot_port)]
         if self._fullscreen:
             cmd.append("--fullscreen")
         env = dict(os.environ)
@@ -127,5 +134,7 @@ def transport() -> Transport:
     return _runtime.ensure_started()
 
 
-def configure(*, fullscreen: bool = True):
-    _runtime.configure(fullscreen=fullscreen)
+def configure(*, fullscreen: bool = True,
+              robot_host: str = "localhost", robot_port: int = 9090):
+    _runtime.configure(fullscreen=fullscreen,
+                       robot_host=robot_host, robot_port=robot_port)

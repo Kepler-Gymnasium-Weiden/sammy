@@ -27,6 +27,7 @@ from .modules.vision_backend import VisionBackend
 from .modules.eyes_backend import EyesBackend
 from .modules.mouth_backend import MouthBackend
 from .modules.ears_backend import EarsBackend
+from .modules.body_backend import BodyBackend
 from .modules.ui_backend import UiBackend
 from .ui.main_window import MainWindow
 
@@ -51,6 +52,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
                         help="TCP port to listen on; 0 = pick any free port")
     parser.add_argument("--fullscreen", action="store_true",
                         help="Start in fullscreen mode")
+    parser.add_argument("--robot-host", type=str, default="localhost",
+                        help="rosbridge host for the body module (robot.body.*)")
+    parser.add_argument("--robot-port", type=int, default=9090,
+                        help="rosbridge port for the body module")
     return parser.parse_args(argv)
 
 
@@ -74,9 +79,10 @@ def run(argv: list[str] | None = None) -> int:
     vision = VisionBackend(camera) if camera.is_available() else VisionBackend(camera)
     mouth = MouthBackend()
     ears = EarsBackend()
+    body = BodyBackend(host=args.robot_host, port=args.robot_port)
 
     window = MainWindow(
-        camera=camera, vision=vision, mouth=mouth, ears=ears,
+        camera=camera, vision=vision, mouth=mouth, ears=ears, body=body,
         fullscreen=args.fullscreen,
     )
 
@@ -89,6 +95,7 @@ def run(argv: list[str] | None = None) -> int:
         "eyes": eyes,
         "mouth": mouth,
         "ears": ears,
+        "body": body,
         "ui": ui,
     })
     server.set_dispatcher(dispatcher)

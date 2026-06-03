@@ -15,13 +15,14 @@ from .taskbar import Taskbar
 from .settings.eyes_settings import EyesSettingsPanel
 from .settings.mouth_settings import MouthSettingsPanel
 from .settings.ears_settings import EarsSettingsPanel
+from .settings.body_settings import BodySettingsPanel
 
 
 class MainWindow(QMainWindow):
     stop_requested = pyqtSignal()
 
     def __init__(self, *, camera=None, vision=None, mouth=None, ears=None,
-                 fullscreen: bool = True):
+                 body=None, fullscreen: bool = True):
         super().__init__()
         self.setWindowTitle("pib robot")
         self.resize(1100, 620)
@@ -54,6 +55,8 @@ class MainWindow(QMainWindow):
             self.taskbar.add_tab("Mouth", MouthSettingsPanel(mouth))
         if ears is not None:
             self.taskbar.add_tab("Ears", EarsSettingsPanel(ears))
+        if body is not None:
+            self.taskbar.add_tab("Body", BodySettingsPanel(body))
 
         self.taskbar.stop_clicked.connect(self.stop_requested)
 

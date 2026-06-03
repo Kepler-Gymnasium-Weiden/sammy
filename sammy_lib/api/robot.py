@@ -18,6 +18,7 @@ from . import _runtime
 from .eyes import Eyes
 from .mouth import Mouth
 from .ears import Ears
+from .body import Body
 from .ui import Ui
 from .exceptions import ScriptStopped
 
@@ -27,11 +28,20 @@ class Robot:
         self.eyes = Eyes()
         self.mouth = Mouth()
         self.ears = Ears()
+        self.body = Body()
         self.ui = Ui()
 
-    def configure(self, *, fullscreen: bool = True):
-        """Tweak engine startup options. Call BEFORE any other robot.* method."""
-        _runtime.configure(fullscreen=fullscreen)
+    def configure(self, *, fullscreen: bool = True,
+                  robot_host: str = "localhost", robot_port: int = 9090):
+        """Tweak engine startup options. Call BEFORE any other robot.* method.
+
+        `robot_host` / `robot_port` point the body module (`robot.body.*`) at the
+        robot's rosbridge. The default `localhost:9090` is right when the code
+        runs on the robot itself; use the robot's IP to drive it from another
+        machine.
+        """
+        _runtime.configure(fullscreen=fullscreen,
+                           robot_host=robot_host, robot_port=robot_port)
 
     def start(self):
         """Explicitly start the engine. Optional — the first API call also starts it."""

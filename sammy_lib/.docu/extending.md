@@ -1,7 +1,18 @@
 # Adding a new module
 
-Suppose you want to add `robot.arm.wave()`. There are three files plus one
-line in the dispatcher.
+> **Driving real robot hardware (arms / hands / head)?** You almost certainly
+> do **not** want this recipe. That hardware comes from the pib-sdk and is
+> exposed *automatically* under `robot.body.*` — adding a motor group there
+> means bumping the dependency, not writing code. See [`body.md`](body.md).
+>
+> The hand-written recipe below is for **simulated** or **custom** modules that
+> live inside the robot-face engine (like eyes / mouth / ears) — things with no
+> SDK to reflect.
+
+Suppose you want a simulated `robot.lamp.on()`. There are three files plus one
+line in the dispatcher. (The same shape was historically used for `robot.arm`,
+before the body became SDK-driven — the example below keeps `arm` only because
+it reads well; for real arms, use `robot.body`.)
 
 ## 1. Engine-side backend
 
@@ -96,5 +107,9 @@ robot.arm.wave()
 robot.run()
 ```
 
-That's the whole pattern. Modules share zero state apart from the engine
-window they live in.
+That's the whole pattern for a simulated module. Modules share zero state apart
+from the engine window they live in.
+
+For the contrasting, reflection-based approach used by SDK-backed hardware —
+where parts are discovered at runtime and never hand-listed — see
+[`body.md`](body.md).

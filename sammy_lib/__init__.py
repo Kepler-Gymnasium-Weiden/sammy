@@ -7,10 +7,17 @@ Students only need:
     robot.run()
 """
 
-from .api import Robot, PibError, ScriptStopped, EngineUnavailable, EngineCallError
+from .api import (
+    Robot,
+    PibError,
+    ScriptStopped,
+    EngineUnavailable,
+    EngineCallError,
+    RobotNotConnected,
+)
 
 #: Module-level singleton. Students never instantiate `Robot` themselves.
 robot = Robot()
 
 __all__ = ["robot", "Robot", "PibError", "ScriptStopped",
-           "EngineUnavailable", "EngineCallError"]
+           "EngineUnavailable", "EngineCallError", "RobotNotConnected"]

@@ -11,7 +11,8 @@ from .exceptions import (
     ScriptStopped,
     EngineUnavailable,
     EngineCallError,
+    RobotNotConnected,
 )
 
 __all__ = ["Robot", "PibError", "ScriptStopped",
-           "EngineUnavailable", "EngineCallError"]
+           "EngineUnavailable", "EngineCallError", "RobotNotConnected"]

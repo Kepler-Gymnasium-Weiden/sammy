@@ -31,3 +31,14 @@ class EngineCallError(PibError):
         super().__init__(message)
         self.remote_type = remote_type
         self.remote_trace = trace
+
+
+class RobotNotConnected(PibError):
+    """A body command needed the physical robot, but no ROS bridge is connected.
+
+    Movement, settings and hand presets (`robot.body.*`) all require a live
+    connection to the robot's rosbridge. Part *discovery* (e.g.
+    `robot.body.parts`) works offline, so this is only raised when you try to
+    actually move something with no robot reachable. Check the Body tab in the
+    robot window, or call `robot.body.reconnect()` once the robot is up.
+    """
