@@ -302,7 +302,14 @@ class BodyBackend(ModuleBase):
             try:
                 ros = getattr(w, "ros", None)
                 if ros is not None and getattr(ros, "is_connected", False):
-                    ros.terminate()
+                    # Close ONLY the websocket — never ``terminate()``. roslibpy
+                    # drives a single global Twisted reactor; ``terminate()``
+                    # stops it, and a Twisted reactor cannot be restarted in the
+                    # same process. The next ``Write()`` would then die with
+                    # ``ReactorNotRestartable``. ``close()`` leaves the reactor
+                    # running so reconnects reuse it (``Ros.run()`` is a no-op
+                    # when the reactor is already up).
+                    ros.close()
             except Exception:
                 pass
 
