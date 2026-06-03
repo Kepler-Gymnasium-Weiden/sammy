@@ -19,7 +19,8 @@ import socket
 import sys
 import traceback
 
-from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtCore import QObject, Qt, pyqtSlot
+from PyQt6.QtGui import QColor, QPalette
 from PyQt6.QtWidgets import QApplication
 
 from .ipc.server import IPCServer
@@ -62,6 +63,48 @@ def _safe_backend(label: str, factory):
         print(f"[engine] '{label}' backend disabled (init failed); "
               f"the rest of the robot will still run", flush=True)
         return None
+
+
+def _apply_dark_palette(app: QApplication) -> None:
+    """Force a consistent dark theme regardless of the host OS theme.
+
+    The window, taskbar and panels paint themselves dark, but the text widgets
+    (labels, combo boxes, line edits, checkboxes, sliders) inherit their colors
+    from the system palette. On Linux with a light desktop theme that leaves the
+    text black-on-dark and unreadable. Windows happened to default to light text.
+
+    Setting the Fusion style first makes Qt honor the palette consistently on
+    every platform (native styles ignore palette colors in places), then we
+    install a full dark palette so every default-styled widget reads correctly.
+    """
+    app.setStyle("Fusion")
+
+    bg = QColor(24, 28, 38)          # base window / panel background
+    base = QColor(30, 34, 44)        # input field background
+    text = QColor(225, 225, 225)     # primary text
+    disabled = QColor(120, 124, 132)
+    highlight = QColor(74, 144, 226)  # matches the active taskbar chip (#4a90e2)
+
+    pal = QPalette()
+    pal.setColor(QPalette.ColorRole.Window, bg)
+    pal.setColor(QPalette.ColorRole.WindowText, text)
+    pal.setColor(QPalette.ColorRole.Base, base)
+    pal.setColor(QPalette.ColorRole.AlternateBase, bg)
+    pal.setColor(QPalette.ColorRole.Text, text)
+    pal.setColor(QPalette.ColorRole.Button, QColor(44, 49, 60))
+    pal.setColor(QPalette.ColorRole.ButtonText, text)
+    pal.setColor(QPalette.ColorRole.ToolTipBase, base)
+    pal.setColor(QPalette.ColorRole.ToolTipText, text)
+    pal.setColor(QPalette.ColorRole.PlaceholderText, disabled)
+    pal.setColor(QPalette.ColorRole.Highlight, highlight)
+    pal.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
+    pal.setColor(QPalette.ColorRole.Link, highlight)
+
+    for role in (QPalette.ColorRole.WindowText, QPalette.ColorRole.Text,
+                 QPalette.ColorRole.ButtonText):
+        pal.setColor(QPalette.ColorGroup.Disabled, role, disabled)
+
+    app.setPalette(pal)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -111,6 +154,7 @@ def run(argv: list[str] | None = None) -> int:
     try:
         # 2. Qt setup.
         app = QApplication(sys.argv)
+        _apply_dark_palette(app)
 
         # 3. Module backends. The eyes/face are core; the rest are optional and
         #    fail soft (a disabled subsystem must not brick the whole engine).
