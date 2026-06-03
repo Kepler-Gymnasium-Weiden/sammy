@@ -123,6 +123,12 @@ class Runtime:
                     return int(line.split("=", 1)[1])
                 except ValueError:
                     pass
+            elif line.startswith("ENGINE_START_ERROR:"):
+                # The engine reports it failed to start (before announcing a
+                # port). Any traceback it printed has already been forwarded
+                # above; surface a clean message instead of a generic timeout.
+                detail = line.split(":", 1)[1].strip()
+                raise EngineUnavailable(f"engine failed to start: {detail}")
             # Anything else is engine log output; forward to stderr for debugging.
             print(f"[engine] {line}", file=sys.stderr)
         raise EngineUnavailable("engine never reported a port")
