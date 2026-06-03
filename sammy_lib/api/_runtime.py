@@ -75,7 +75,32 @@ class Runtime:
             raise EngineUnavailable(f"could not launch engine: {exc}") from exc
 
         port = self._read_port()
+        # Keep draining the child's stdout/stderr (merged) AFTER the port is
+        # announced. Otherwise a crash during GUI startup — which happens after
+        # `PORT=` is printed and the OS has already accepted our connection into
+        # the listen backlog — is invisible, and the first call just fails with
+        # the opaque "engine closed before reply arrived". Forwarding the output
+        # lets the engine's real traceback reach the student's terminal.
+        drain = threading.Thread(target=self._drain_output,
+                                 name="pib-engine-log", daemon=True)
+        drain.start()
         return Transport("127.0.0.1", port)
+
+    def _drain_output(self):
+        """Forward the engine's post-startup output to stderr for debugging."""
+        proc = self._proc
+        if proc is None or proc.stdout is None:
+            return
+        try:
+            for line in proc.stdout:
+                line = line.rstrip("\n")
+                if line:
+                    print(f"[engine] {line}", file=sys.stderr)
+        except (OSError, ValueError):
+            pass
+        rc = proc.poll()
+        if rc not in (0, None):
+            print(f"[engine] subprocess exited with code {rc}", file=sys.stderr)
 
     def _read_port(self) -> int:
         """Block until the child writes `PORT=<n>` on its first line of stdout."""
