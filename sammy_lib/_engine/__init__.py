@@ -1,1 +1,1 @@
-"""Internal GUI runtime for pib. Not part of the student-facing API."""
+"""Internal GUI runtime for sammy_lib. Not part of the student-facing API."""

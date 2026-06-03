@@ -1,6 +1,6 @@
 """The `robot` singleton — the only object students interact with.
 
-    from pib import robot
+    from sammy_lib import robot
 
     robot.eyes.look_left()
     robot.mouth.say("hello")

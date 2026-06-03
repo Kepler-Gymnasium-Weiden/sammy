@@ -1,4 +1,4 @@
-"""Allow `python -m pib._engine` for dev."""
+"""Allow `python -m sammy_lib._engine` for dev."""
 
 from .app import run
 

@@ -2,7 +2,7 @@
 
 import time
 
-from pib import robot
+from sammy_lib import robot
 
 for state in ("happy", "angry", "surprised", "tired", "idle"):
     getattr(robot.eyes, state)()

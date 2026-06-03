@@ -94,10 +94,10 @@ not on the engine's GUI thread. That means:
 
 Adding a new element type means:
 
-1. Add a class in `pib/_engine/ui/elements/`. It must have `widget`,
+1. Add a class in `sammy_lib/_engine/ui/elements/`. It must have `widget`,
    `element_id`, `on_event`, and a `set(value)` method.
-2. Register it in `pib/_engine/ui/elements/__init__.py:ELEMENT_TYPES`.
-3. Add a constructor method on `Tab` in `pib/api/ui.py` that emits the right
+2. Register it in `sammy_lib/_engine/ui/elements/__init__.py:ELEMENT_TYPES`.
+3. Add a constructor method on `Tab` in `sammy_lib/api/ui.py` that emits the right
    `add_element` call.
 
 No transport or dispatcher changes needed — they handle the new type

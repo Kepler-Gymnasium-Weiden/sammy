@@ -1,6 +1,6 @@
 """Simplest possible program: move the eyes and say hello."""
 
-from pib import robot
+from sammy_lib import robot
 
 robot.eyes.look_left()
 robot.eyes.look_right()

@@ -5,7 +5,7 @@ line in the dispatcher.
 
 ## 1. Engine-side backend
 
-`pib/_engine/modules/arm_backend.py`:
+`sammy_lib/_engine/modules/arm_backend.py`:
 
 ```python
 from .base import ModuleBase
@@ -32,7 +32,7 @@ underscore is callable from the client.
 
 ## 2. Client-side facade
 
-`pib/api/arm.py`:
+`sammy_lib/api/arm.py`:
 
 ```python
 from . import _runtime
@@ -51,12 +51,12 @@ class Arm:
 
 ## 3. Optional settings panel
 
-`pib/_engine/ui/settings/arm_settings.py` — a `QWidget` with whatever
+`sammy_lib/_engine/ui/settings/arm_settings.py` — a `QWidget` with whatever
 controls you want exposed (speed slider, emergency-stop, calibration).
 
 ## 4. Wire it up
 
-In `pib/_engine/app.py`:
+In `sammy_lib/_engine/app.py`:
 
 ```python
 from .modules.arm_backend import ArmBackend
@@ -75,7 +75,7 @@ dispatcher = Dispatcher({
 })
 ```
 
-In `pib/api/robot.py`:
+In `sammy_lib/api/robot.py`:
 
 ```python
 from .arm import Arm
@@ -90,7 +90,7 @@ class Robot:
 Students can now write:
 
 ```python
-from pib import robot
+from sammy_lib import robot
 robot.eyes.happy()
 robot.arm.wave()
 robot.run()

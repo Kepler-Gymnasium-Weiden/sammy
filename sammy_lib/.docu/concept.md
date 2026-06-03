@@ -11,15 +11,15 @@
 ## Two packages, one Python install
 
 ```
-pib-eyes/
-  pib/                    ← single installable package
+sammy/
+  sammy_lib/              ← single installable package
     api/                  ← student-facing API surface
     _engine/              ← private GUI subprocess (leading underscore = "don't touch")
   examples/               ← teacher-facing reference programs
 ```
 
 Both halves live in the same package. A single `pip install` (or PYTHONPATH
-entry) is enough; `pib/api/_runtime.py` knows where to find `pib._engine`
+entry) is enough; `sammy_lib/api/_runtime.py` knows where to find `sammy_lib._engine`
 because it imports it by name.
 
 ## Two-process model
@@ -27,11 +27,11 @@ because it imports it by name.
 Students write a regular Python program — for instance `examples/01_hello.py`.
 Running `python 01_hello.py` does this:
 
-1. `from pib import robot` — loads `pib/__init__.py`, which instantiates the
+1. `from sammy_lib import robot` — loads `sammy_lib/__init__.py`, which instantiates the
    `Robot` singleton. Nothing visible happens yet; the engine is **not** started.
 2. The first call (e.g. `robot.eyes.look_left()`) triggers
-   `pib/api/_runtime.py:Runtime.ensure_started()`, which:
-   - Spawns `python -m pib._engine --port 0 --fullscreen` as a subprocess.
+   `sammy_lib/api/_runtime.py:Runtime.ensure_started()`, which:
+   - Spawns `python -m sammy_lib._engine --port 0 --fullscreen` as a subprocess.
    - Reads `PORT=<n>` from the child's stdout to learn the TCP port.
    - Opens a `Transport` socket to `127.0.0.1:<port>`.
 3. The call is serialised to JSON, sent to the engine, and the student's thread
@@ -52,11 +52,11 @@ Every module follows the same three-layer recipe:
 
 | Layer | Where | Job |
 |-------|-------|-----|
-| **Facade** (student-facing) | `pib/api/<name>.py` | Tiny class with one method per command; each method just calls `_runtime.transport().call(module, method, args)`. |
-| **Backend** (engine-side)   | `pib/_engine/modules/<name>_backend.py` | Subclass of `ModuleBase`; implements the commands. May touch Qt widgets directly because it runs on the GUI thread. |
-| **Settings panel** (optional) | `pib/_engine/ui/settings/<name>_settings.py` | A `QWidget` shown when the user clicks the module's tab in the taskbar. |
+| **Facade** (student-facing) | `sammy_lib/api/<name>.py` | Tiny class with one method per command; each method just calls `_runtime.transport().call(module, method, args)`. |
+| **Backend** (engine-side)   | `sammy_lib/_engine/modules/<name>_backend.py` | Subclass of `ModuleBase`; implements the commands. May touch Qt widgets directly because it runs on the GUI thread. |
+| **Settings panel** (optional) | `sammy_lib/_engine/ui/settings/<name>_settings.py` | A `QWidget` shown when the user clicks the module's tab in the taskbar. |
 
-The dispatcher in `pib/_engine/app.py:Dispatcher` is the only thing that knows
+The dispatcher in `sammy_lib/_engine/app.py:Dispatcher` is the only thing that knows
 about all modules — it routes `("eyes", "look_left", [], {})` to
 `backends["eyes"].dispatch("look_left", [], {})`. Adding a new module means
 adding three files and one entry in the dispatcher dict.

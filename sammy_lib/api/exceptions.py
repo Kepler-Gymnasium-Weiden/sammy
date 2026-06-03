@@ -1,8 +1,8 @@
-"""Exceptions raised by the `pib` student-facing API."""
+"""Exceptions raised by the `sammy_lib` student-facing API."""
 
 
 class PibError(Exception):
-    """Base class for everything pib raises at student code."""
+    """Base class for everything the library raises at student code."""
 
 
 class ScriptStopped(PibError):
@@ -10,7 +10,7 @@ class ScriptStopped(PibError):
 
     Catch it at the top of your program if you want a custom shutdown, e.g.:
 
-        from pib import robot, ScriptStopped
+        from sammy_lib import robot, ScriptStopped
         try:
             ...
             robot.run()

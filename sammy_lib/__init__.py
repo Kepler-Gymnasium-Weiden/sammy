@@ -1,8 +1,8 @@
-"""pib — programmable robot for the classroom.
+"""sammy_lib — programmable robot for the classroom.
 
 Students only need:
 
-    from pib import robot
+    from sammy_lib import robot
     robot.eyes.look_left()
     robot.run()
 """

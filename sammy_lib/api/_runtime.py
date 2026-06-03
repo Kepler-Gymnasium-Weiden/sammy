@@ -1,9 +1,9 @@
 """Engine lifecycle: spawn the GUI subprocess and connect to it.
 
-The student program imports `pib` and accesses `pib.robot`. On the very first
+The student program imports `sammy_lib` and accesses `sammy_lib.robot`. On the very first
 API call, `Runtime.ensure_started()` is invoked, which:
 
-  1. Spawns `python -m pib._engine --fullscreen` as a subprocess.
+  1. Spawns `python -m sammy_lib._engine --fullscreen` as a subprocess.
   2. Reads `PORT=<n>` from its stdout to learn which TCP port to dial.
   3. Opens a `Transport` to that port.
 
@@ -53,7 +53,7 @@ class Runtime:
             return self._transport
 
     def _start_engine(self) -> Transport:
-        cmd = [sys.executable, "-m", "pib._engine", "--port", "0"]
+        cmd = [sys.executable, "-m", "sammy_lib._engine", "--port", "0"]
         if self._fullscreen:
             cmd.append("--fullscreen")
         env = dict(os.environ)

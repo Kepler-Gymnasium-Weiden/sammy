@@ -4,7 +4,7 @@
 
 A loopback TCP socket carries newline-delimited JSON. Three message types
 travel in both directions; schemas are defined in
-`pib/_engine/ipc/protocol.py`.
+`sammy_lib/_engine/ipc/protocol.py`.
 
 ### Client → engine
 
@@ -36,7 +36,7 @@ The protocol is intentionally tiny — adding a new message type is a half-hour
 job. There is no version negotiation; client and engine ship together so they
 always agree on the schema.
 
-## Threading — client side (`pib/api/_transport.py`)
+## Threading — client side (`sammy_lib/api/_transport.py`)
 
 ```
        student's main thread
@@ -70,7 +70,7 @@ them and routes:
 Writes are protected by `_write_lock` because the worker-pool threads might
 make API calls during a handler. Only one writer at a time touches the socket.
 
-## Threading — engine side (`pib/_engine/ipc/server.py`)
+## Threading — engine side (`sammy_lib/_engine/ipc/server.py`)
 
 ```
    client → socket
@@ -119,7 +119,7 @@ simpler and sufficient.
 
 ## Engine startup handshake
 
-`pib/api/_runtime.py:Runtime._read_port()` performs a single-step handshake:
+`sammy_lib/api/_runtime.py:Runtime._read_port()` performs a single-step handshake:
 
 1. The runtime spawns the engine with `--port 0` (let the OS pick a port).
 2. The engine binds, gets its actual port, and prints `PORT=<n>\n` to stdout

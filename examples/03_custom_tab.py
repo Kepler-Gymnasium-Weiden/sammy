@@ -1,6 +1,6 @@
 """Build a custom 'Tricks' tab with buttons, a slider and a status label."""
 
-from pib import robot
+from sammy_lib import robot
 
 tricks = robot.ui.tab("Tricks")
 

@@ -9,7 +9,7 @@ single student-facing namespace.
        USB camera
             │  cv2.VideoCapture (CAP_DSHOW on Windows)
             ▼
-    _CaptureThread    in pib/_engine/modules/camera_backend.py
+    _CaptureThread    in sammy_lib/_engine/modules/camera_backend.py
             │  pulls frames at the configured FPS, converts BGR→RGB
             ├──────────► CameraBackend.frame_ready  (Qt signal)
             │               │
@@ -19,7 +19,7 @@ single student-facing namespace.
             └──► CameraBackend.latest_frame()      (consumer-pulled, thread-safe)
                        │
                        ▼
-        VisionBackend.detect()      in pib/_engine/modules/vision_backend.py
+        VisionBackend.detect()      in sammy_lib/_engine/modules/vision_backend.py
                        │  YOLOv8n via ultralytics; CPU; 80 COCO classes
                        ▼
                 List[{label, confidence, box}]
@@ -94,10 +94,10 @@ Eventually `robot.eyes.see()` will return the latest frame to the student
 as a numpy array. Sending 900 KB of RGB over JSON per call is wasteful, so
 the plan is:
 
-1. `pib/_engine/ipc/frame_server.py` publishes RGB frames into a
+1. `sammy_lib/_engine/ipc/frame_server.py` publishes RGB frames into a
    `multiprocessing.shared_memory.SharedMemory` block + a small lock-free
    sequence counter.
-2. `pib/api/_frames.py:FrameReader` opens the same shared memory by name
+2. `sammy_lib/api/_frames.py:FrameReader` opens the same shared memory by name
    (negotiated during the engine handshake) and exposes `latest()`.
 3. `robot.eyes.see()` simply returns `FrameReader.latest()` — no IPC call.
 

@@ -1,4 +1,4 @@
-"""JSON message schema shared between client (pib/api) and engine (pib/_engine).
+"""JSON message schema shared between client (sammy_lib/api) and engine (sammy_lib/_engine).
 
 Each message is a single line of UTF-8 JSON terminated by a newline. Three
 message types travel over the socket:

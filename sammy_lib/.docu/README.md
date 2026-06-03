@@ -1,6 +1,6 @@
-# pib — Technical Documentation
+# sammy_lib — Technical Documentation
 
-This directory holds the **internal** architecture notes for the whole `pib`
+This directory holds the **internal** architecture notes for the whole `sammy_lib`
 package — both the `api/` surface and the `_engine/` runtime. It documents
 how things are wired up, not how to *use* them. For usage, see the top-level
 `README.md` and the files in `examples/`.
@@ -8,7 +8,7 @@ how things are wired up, not how to *use* them. For usage, see the top-level
 The student-facing surface is intentionally tiny: students do
 
 ```python
-from pib import robot
+from sammy_lib import robot
 robot.eyes.look_left()
 ```
 
@@ -26,16 +26,16 @@ Everything below that line is described here.
 
 ```
 ┌─────────────────────────────┐   subprocess + TCP socket   ┌──────────────────────────────┐
-│  student program            │  ◄────── JSON messages ─────►│  pib._engine (Qt GUI)        │
+│  student program            │  ◄────── JSON messages ─────►│  sammy_lib._engine (Qt GUI)  │
 │  (their own .py file)       │                              │                              │
 │                             │                              │  ┌────────────────────────┐  │
-│  from pib import robot      │                              │  │ EyeWidget (fullscreen) │  │
+│  from sammy_lib import robot│                              │  │ EyeWidget (fullscreen) │  │
 │  robot.eyes.look_left()     │                              │  ├────────────────────────┤  │
 │  robot.ui.tab(...).button() │                              │  │ Taskbar (tabs + Stop)  │  │
 │  robot.run()                │                              │  └────────────────────────┘  │
 └─────────────────────────────┘                              └──────────────────────────────┘
-       pib/                                                          pib/_engine/
+       sammy_lib/                                              sammy_lib/_engine/
 ```
 
-The student never imports anything from `pib._engine`; the leading underscore
+The student never imports anything from `sammy_lib._engine`; the leading underscore
 marks it as private.

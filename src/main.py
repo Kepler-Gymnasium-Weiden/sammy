@@ -1,4 +1,4 @@
-from pib import robot
+from sammy_lib import robot
 
 robot.eyes.look_left()
 robot.eyes.look_right()

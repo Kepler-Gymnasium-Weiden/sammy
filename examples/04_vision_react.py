@@ -6,7 +6,7 @@ Press Stop in the taskbar to halt the loop.
 
 import time
 
-from pib import robot, ScriptStopped
+from sammy_lib import robot, ScriptStopped
 
 
 def main():

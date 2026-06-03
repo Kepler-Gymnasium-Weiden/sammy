@@ -1,11 +1,11 @@
 """Engine bootstrap.
 
 Run either as a subprocess of the student program (the normal case — launched
-by `pib/api/_runtime.py`) or standalone for development:
+by `sammy_lib/api/_runtime.py`) or standalone for development:
 
-    python -m pib._engine                    # windowed dev mode, port 7311
-    python -m pib._engine --fullscreen       # fullscreen
-    python -m pib._engine --port 0           # pick a free port, print PORT=<n>
+    python -m sammy_lib._engine                    # windowed dev mode, port 7311
+    python -m sammy_lib._engine --fullscreen       # fullscreen
+    python -m sammy_lib._engine --port 0           # pick a free port, print PORT=<n>
 
 On startup the engine binds a TCP listening socket on 127.0.0.1, prints
 `PORT=<n>\\n` to stdout (so the spawning runtime can connect), then enters the
@@ -46,7 +46,7 @@ class Dispatcher(QObject):
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(prog="pib._engine")
+    parser = argparse.ArgumentParser(prog="sammy_lib._engine")
     parser.add_argument("--port", type=int, default=0,
                         help="TCP port to listen on; 0 = pick any free port")
     parser.add_argument("--fullscreen", action="store_true",

@@ -14,7 +14,7 @@ Benötigt die ears-Extras (vosk + sounddevice):
 
 import time
 
-from pib import robot, ScriptStopped
+from sammy_lib import robot, ScriptStopped
 
 
 # Deutsche Stimme + deutsches Sprachmodell sind beides Standard,
