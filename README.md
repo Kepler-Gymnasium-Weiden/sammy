@@ -5,6 +5,7 @@
     a. `python3.9 -m venv .venv`
     b. `source .venv/bin/activate`
 3. bibliotheken installieren `pip install -e .`
+    a. `sudo apt install -y libportaudio2`
 4. in src ordner navigieren `cd src`
 5. software ausühren `python3.9 main.py`
 

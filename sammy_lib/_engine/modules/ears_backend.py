@@ -30,10 +30,18 @@ try:
     import vosk  # type: ignore
     import sounddevice as sd  # type: ignore
     _HAVE_EARS = True
-except Exception:
+    _EARS_IMPORT_ERROR = ""
+except Exception as _exc:
+    # NOTE: importing these can fail even when the *Python* packages are
+    # installed. `sounddevice` wraps the native PortAudio library, which the
+    # Linux wheel does NOT bundle — without the system package the import
+    # raises `OSError: PortAudio library not found` (fix: `apt install
+    # libportaudio2`). Capture the real reason rather than guessing "not
+    # installed", which sends people down the wrong path.
     vosk = None  # type: ignore
     sd = None  # type: ignore
     _HAVE_EARS = False
+    _EARS_IMPORT_ERROR = f"{type(_exc).__name__}: {_exc}"
 
 
 # Vosk prints a wall of diagnostics to stderr on model load; quiet it.
@@ -217,10 +225,21 @@ class EarsBackend(QObject, ModuleBase):
         self._device: Optional[int] = None
         self._status = "stopped"
 
+        if not _HAVE_EARS and _EARS_IMPORT_ERROR:
+            # Surface the real reason in the engine log so a missing native
+            # dependency (e.g. PortAudio) isn't mistaken for "not installed".
+            print(f"[ears] speech recognition disabled: {_EARS_IMPORT_ERROR}",
+                  flush=True)
+
     # ---- ModuleBase / capability checks -----------------------------------
 
     def is_available(self) -> bool:
         return _HAVE_EARS
+
+    @property
+    def import_error(self) -> str:
+        """Why the ears are unavailable (empty string if they're fine)."""
+        return _EARS_IMPORT_ERROR
 
     @property
     def status(self) -> str:

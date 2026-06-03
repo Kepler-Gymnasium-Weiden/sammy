@@ -28,9 +28,18 @@ class EarsSettingsPanel(QWidget):
         root.addWidget(QLabel("<b>Ears</b>"))
 
         if not self._ears.is_available():
-            root.addWidget(QLabel(
-                "vosk + sounddevice not installed — heard() always returns False."
-            ))
+            reason = self._ears.import_error
+            if "portaudio" in reason.lower():
+                detail = ("PortAudio is missing — install it with "
+                          "'sudo apt install libportaudio2'.")
+            elif reason:
+                detail = reason
+            else:
+                detail = "vosk + sounddevice are unavailable."
+            label = QLabel(f"Speech recognition off: {detail}\n"
+                           f"heard() always returns False.")
+            label.setWordWrap(True)
+            root.addWidget(label)
             root.addStretch(1)
             return
 
