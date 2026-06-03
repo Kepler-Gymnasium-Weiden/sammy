@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- ML model weights (downloaded on first vision run) ---
+# Ultralytics caches weights in CWD by default — keep them out of git.
+yolov8*.pt
+yolo11*.pt
+runs/
