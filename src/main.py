@@ -1,5 +1,7 @@
 from sammy_lib import robot
 
+robot.configure(fullscreen=False)
+
 robot.eyes.look_left()
 robot.eyes.look_right()
 robot.eyes.blink()
