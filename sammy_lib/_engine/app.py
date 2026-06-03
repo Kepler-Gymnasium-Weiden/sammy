@@ -62,6 +62,16 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 def run(argv: list[str] | None = None) -> int:
     args = _parse_args(argv or sys.argv[1:])
 
+    # 0. A diagnostic print must never be able to kill the engine. On a non-UTF-8
+    #    locale (e.g. ISO-8859-15), printing a character like "…" raises
+    #    UnicodeEncodeError, which would otherwise abort startup. Force UTF-8 on
+    #    our stdio and never raise on an un-encodable character.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+        except (AttributeError, ValueError):
+            pass
+
     # 1. Bind the listening socket BEFORE Qt starts, so we can announce the
     #    port to the spawning runtime and block until a client connects.
     listen = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

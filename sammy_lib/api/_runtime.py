@@ -66,10 +66,15 @@ class Runtime:
         env = dict(os.environ)
         # Force unbuffered stdout in the child so `PORT=` arrives immediately.
         env.setdefault("PYTHONUNBUFFERED", "1")
+        # Force the child's stdio to UTF-8 regardless of the system locale, so a
+        # log line with a non-ASCII character can't raise UnicodeEncodeError and
+        # crash the engine (a non-UTF-8 locale like ISO-8859-15 otherwise does).
+        env["PYTHONIOENCODING"] = "utf-8"
         try:
             self._proc = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 env=env, text=True, bufsize=1,
+                encoding="utf-8", errors="backslashreplace",
             )
         except OSError as exc:
             raise EngineUnavailable(f"could not launch engine: {exc}") from exc
