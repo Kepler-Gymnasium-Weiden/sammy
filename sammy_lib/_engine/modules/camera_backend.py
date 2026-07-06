@@ -11,6 +11,7 @@ crashing the engine.
 
 from __future__ import annotations
 
+import sys
 import threading
 import time
 from typing import Optional
@@ -27,6 +28,14 @@ except Exception:
     _HAVE_OPENCV = False
 
 
+def _capture_backend() -> int:
+    # CAP_DSHOW exists as a constant on all platforms, so hasattr() is
+    # not a Windows check — select by platform instead.
+    if sys.platform == "win32":
+        return cv2.CAP_DSHOW
+    return cv2.CAP_ANY
+
+
 class _CaptureThread(QThread):
     frame_ready = pyqtSignal(object)  # latest numpy frame (RGB)
 
@@ -39,7 +48,7 @@ class _CaptureThread(QThread):
         self._latest = None
 
     def run(self):
-        cap = cv2.VideoCapture(self._device_index, cv2.CAP_DSHOW if hasattr(cv2, "CAP_DSHOW") else 0)
+        cap = cv2.VideoCapture(self._device_index, _capture_backend())
         if not cap.isOpened():
             return
         self._running = True
@@ -124,7 +133,7 @@ class CameraBackend(QObject):
         """
         if not _HAVE_OPENCV:
             return []
-        backend = cv2.CAP_DSHOW if hasattr(cv2, "CAP_DSHOW") else 0
+        backend = _capture_backend()
         result = []
         for i in range(max_probe):
             cap = cv2.VideoCapture(i, backend)
