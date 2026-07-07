@@ -108,7 +108,7 @@ class Taskbar(QWidget):
         # Right-side fixed controls (Pin, Stop).
         self._bar_layout.addStretch(1)
 
-        self._pin_btn = QPushButton("📌")
+        self._pin_btn = QPushButton("Pin")
         self._pin_btn.setCheckable(True)
         self._pin_btn.setChecked(True)
         self._pin_btn.setToolTip("Pin taskbar (keep it visible)")
