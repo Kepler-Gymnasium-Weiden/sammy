@@ -297,6 +297,15 @@ class EarsBackend(QObject, ModuleBase):
                     return True
         return False
 
+    def what_did_you_hear(self) -> str:
+        """Return the recent transcript as one string without consuming it."""
+        if not _HAVE_EARS:
+            return ""
+        if self._listener is None:
+            self.start_listening()
+        with self._lock:
+            return " ".join(self._buffer).strip()
+
     def recent_phrases(self) -> list[str]:
         with self._lock:
             return list(self._buffer)

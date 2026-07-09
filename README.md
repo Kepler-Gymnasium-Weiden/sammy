@@ -93,6 +93,7 @@ Der Roboter hört über das Mikrofon zu – ebenfalls komplett offline.
 
 - `robot.ears.heard("hallo")` – `True`, wenn das Wort gerade gehört wurde.
   Das Zuhören startet beim ersten Aufruf automatisch.
+- `robot.ears.what_did_you_hear()` – gibt den zuletzt gehörten Text als String zurück.
 - `robot.ears.start_listening()` – das Zuhören von Hand starten
 - `robot.ears.stop_listening()` – das Zuhören stoppen
 
