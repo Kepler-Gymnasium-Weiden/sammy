@@ -18,3 +18,15 @@ class Ears:
 
     def stop_listening(self):
         _runtime.transport().call("ears", "stop_listening")
+
+    def pause_listening(self):
+        """Stop listening but keep the model loaded so resume is instant.
+
+        Use while the robot is talking so it doesn't hear itself. Discards any
+        speech heard so far; resume_listening() picks back up with no reload.
+        """
+        _runtime.transport().call("ears", "pause_listening")
+
+    def resume_listening(self):
+        """Resume listening after pause_listening()."""
+        _runtime.transport().call("ears", "resume_listening")

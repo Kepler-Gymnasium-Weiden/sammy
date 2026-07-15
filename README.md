@@ -96,12 +96,19 @@ Der Roboter hört über das Mikrofon zu – ebenfalls komplett offline.
 - `robot.ears.what_did_you_hear()` – gibt den zuletzt gehörten Text als String zurück.
 - `robot.ears.start_listening()` – das Zuhören von Hand starten
 - `robot.ears.stop_listening()` – das Zuhören stoppen
+- `robot.ears.pause_listening()` – das Zuhören pausieren, ohne das Modell zu
+  verwerfen. Der Roboter hört nichts Neues mehr und vergisst das bisher Gehörte.
+  Nützlich, während er selbst spricht (damit er sich nicht selbst hört).
+- `robot.ears.resume_listening()` – nach dem Pausieren weiterhören. Startet
+  sofort, weil das Modell geladen bleibt (kein erneutes Laden).
 
 ```python
 robot.ears.start_listening()
 while True:
     if robot.ears.heard("hallo"):
+        robot.ears.pause_listening()   # nicht sich selbst hören
         robot.mouth.say("Hallo!")
+        robot.ears.resume_listening()  # sofort wieder da, kein Neuladen
         robot.eyes.happy()
 ```
 

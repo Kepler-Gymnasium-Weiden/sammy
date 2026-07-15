@@ -158,6 +158,7 @@ class _ListenerThread(QThread):
         self._model_name = model_name
         self._device = device
         self._running = True
+        self._muted = threading.Event()
 
     def run(self):
         try:
@@ -181,11 +182,24 @@ class _ListenerThread(QThread):
                 callback=callback,
             ):
                 self.status.emit("listening")
+                prev_muted = False
                 while self._running:
                     try:
                         data = audio_q.get(timeout=0.1)
                     except queue.Empty:
                         continue
+                    if self._muted.is_set():
+                        if not prev_muted:
+                            # Drop a half-heard utterance on entering pause.
+                            recognizer.Reset()
+                            prev_muted = True
+                        # Pull + drop audio so the queue stays drained and the
+                        # model/recognizer stay alive for an instant resume.
+                        continue
+                    if prev_muted:
+                        # Discard anything captured during the pause window.
+                        recognizer.Reset()
+                        prev_muted = False
                     if recognizer.AcceptWaveform(data):
                         result = json.loads(recognizer.Result())
                         phrase = (result.get("text") or "").strip()
@@ -194,6 +208,12 @@ class _ListenerThread(QThread):
         except Exception as exc:
             self.status.emit(f"error: {exc}")
             print(f"[ears] listener crashed: {exc!r}", flush=True)
+
+    def pause(self):
+        self._muted.set()
+
+    def resume(self):
+        self._muted.clear()
 
     def stop(self):
         self._running = False
@@ -224,6 +244,7 @@ class EarsBackend(QObject, ModuleBase):
         self._model_name = DEFAULT_MODEL
         self._device: Optional[int] = None
         self._status = "stopped"
+        self._paused = False
 
         if not _HAVE_EARS and _EARS_IMPORT_ERROR:
             # Surface the real reason in the engine log so a missing native
@@ -249,6 +270,10 @@ class EarsBackend(QObject, ModuleBase):
     def is_listening(self) -> bool:
         return self._listener is not None and self._listener.isRunning()
 
+    @property
+    def is_paused(self) -> bool:
+        return self._paused
+
     # ---- Commands callable from the student API ---------------------------
 
     def start_listening(self):
@@ -256,6 +281,7 @@ class EarsBackend(QObject, ModuleBase):
             return
         if self._listener is not None:
             return
+        self._paused = False
         self._listener = _ListenerThread(self._model_name, self._device)
         self._listener.text.connect(self._on_text)
         self._listener.status.connect(self._on_status)
@@ -268,10 +294,36 @@ class EarsBackend(QObject, ModuleBase):
             return
         listener = self._listener
         self._listener = None
+        self._paused = False
         listener.stop()
         with self._lock:
             self._buffer.clear()
         self._set_status("stopped")
+
+    def pause_listening(self):
+        """Stop reacting to speech but keep the model loaded for instant resume.
+
+        Unlike stop_listening() this keeps the worker thread, audio stream and
+        Vosk model/recognizer alive, so resume_listening() is immediate. The
+        current buffer is discarded so the robot doesn't act on stale speech.
+        """
+        if not _HAVE_EARS or self._listener is None:
+            return
+        self._paused = True
+        self._listener.pause()
+        with self._lock:
+            self._buffer.clear()
+        self._set_status("paused")
+
+    def resume_listening(self):
+        """Resume after pause_listening() without reloading the model."""
+        if not _HAVE_EARS or self._listener is None:
+            return
+        self._paused = False
+        with self._lock:
+            self._buffer.clear()
+        self._listener.resume()
+        self._set_status("listening")
 
     def heard(self, phrase: str) -> bool:
         """Return True if `phrase` is in the rolling buffer; consume on hit.
